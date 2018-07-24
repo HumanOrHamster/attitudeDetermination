@@ -2,6 +2,15 @@
 #include<Wire.h>
 #include<math.h>
 
+
+// Description
+/*
+By Binh B.
+07/23/2018 first commit
+
+*/
+
+
 #define ToRad(x) ((x)*0.01745329252)  // *pi/180
 #define ToDeg(x) ((x)*57.2957795131)  // *180/pi
 
@@ -14,10 +23,10 @@ const int LSM303_ACC_ADDR 			= 0b0011001;
 const int LSM303_MAG_ADDR 			= 0b0011110;
 
 // MAG Register LSM303DLHC
-const int CRA_REG_M         = 0x00; // DLH, DLM, DLHC
-const int CRB_REG_M         = 0x01; // DLH, DLM, DLHC
-const int MR_REG_M          = 0x02; // DLH, DLM, DLHC
-const int OUT_X_H_M 		= 0x03; // starting read register for mag
+const int CRA_REG_M         = 0x00;
+const int CRB_REG_M         = 0x01;
+const int MR_REG_M          = 0x02;
+const int OUT_X_H_M 		    = 0x03; // starting read register for mag
 
 
 // tbd on usage
@@ -29,9 +38,9 @@ struct sensorParams
 } lsm303Mag;
 
 // ACC Register LSM303DLHC
-const int CTRL_REG4_A       = 0x23; // DLH, DLM, DLHC
-const int CTRL_REG1_A       = 0x20; // DLH, DLM, DLHC
-const int OUT_X_L_A 		= 0x28; // starting read register for acc
+const int CTRL_REG4_A       = 0x23;
+const int CTRL_REG1_A       = 0x20;
+const int OUT_X_L_A 		    = 0x28; // starting read register for acc
 
 // L3GD20 Address
 const int L3GD20_GYRO_ADDR	= 0b1101011;
@@ -93,7 +102,7 @@ float quatPrev[4] = {1.0, 0.0, 0.0, 0.0};
 float quatSol[4] = {1.0, 0.0, 0.0, 0.0};
 
 // rpy filtering
-float Krpy[3]= {0.05, 0.05, 0.05}; // proportional gains
+float Krpy[3]= {0.05, 0.05, 0.01}; // proportional gains
 
 // execution dt
 float stepSize = 0.02;
@@ -167,8 +176,6 @@ void setup()
     printVec(mOffset);
     */
 
-
-    // NOTE CAN PROBABLY OPTAMIZE THIS OUT TO DO BOTH AT THE SAME TIME AND SAVE 1 SEC
     //calGyroBias(gRaw,gyroRawBias);
     //accelBiasCal(aRaw,accelRawBias);
     calGyroAndAccel(aRaw,accelRawBias,gRaw,gyroRawBias);
@@ -198,12 +205,12 @@ void loop()
     readRawLsm(true,mRaw, accelRawBias, aRaw);
     getRefRPY(mRaw, mGauss, mOffset, isMagNomValid, aRaw, aNorm, RefRpy);
 
-	/*
-	if (isMagNomValid == false)
-	{
-		Serial.println("mag Nom Value Exceeded");
-	}
-	*/
+    /*
+    if (isMagNomValid == false)
+    {
+    	Serial.println("mag Nom Value Exceeded");
+    }
+    */
 
 
     readRawL3G(true,gyroRawBias,gRaw);
@@ -334,8 +341,7 @@ void readRawLsm(bool applyAccelOffset, int (&mRawData)[3],int (&aBiasData)[3], i
 {
 
     Wire.beginTransmission(LSM303_ACC_ADDR);
-    // assert the MSB of the address to get the accelerometer
-    // to do slave-transmit subaddress updating.
+    // need to add a 1 bit to the MSB (SUPER STUPID)
     Wire.write(OUT_X_L_A | (1 << 7)); //
     Wire.endTransmission();
     Wire.requestFrom(LSM303_ACC_ADDR, 6);
@@ -375,8 +381,7 @@ void readRawL3G(bool applyOffset, int (&gBiasData)[3],int (&gRawData)[3])
 {
 
     Wire.beginTransmission(L3GD20_GYRO_ADDR);
-    // assert the MSB of the address to get the accelerometer
-    // to do slave-transmit subaddress updating.
+    // need to add a 1 bit to the MSB (SUPER STUPID)
     Wire.write(OUT_X_L_G | (1 << 7)); //
     Wire.endTransmission();
     Wire.requestFrom(L3GD20_GYRO_ADDR, 6);
@@ -538,8 +543,8 @@ void calGyroAndAccel(int (&aRawData)[3], int (&aBiasData)[3],int (&gRawData)[3],
 void getRefRPY(int (&mRawData)[3], float (&mGaussData)[3], int (&mOffsetData)[3],bool& isMagValid, int (&aRawData)[3], float (&aNormData)[3], float (&refRpyData)[3])
 {
 
-	float mGaussMag;
-	float magErr;
+    float mGaussMag;
+    float magErr;
     // see page 37/42 of LSM303DLHC
     // Need to this to scale values of each axis correctly!
 
@@ -547,19 +552,19 @@ void getRefRPY(int (&mRawData)[3], float (&mGaussData)[3], int (&mOffsetData)[3]
     mGaussData[1] = (mRawData[1] - mOffsetData[1]) / 1100.0; //Y
     mGaussData[2] = (mRawData[2] - mOffsetData[2]) / 980.0; //Z
 
-	///////////////// CHECK FOR EXTERNAL MAG INTEREFERENCE
-	VectorMag(mGaussData,mGaussMag);
-	magErr = abs(mGaussMag - nomGaussMag);
-	if ( magErr >= nomGaussBound )
-	{
-		isMagValid = false;
-	}
-	else
-	{
-		isMagValid = true;
-	}
+    ///////////////// CHECK FOR EXTERNAL MAG INTEREFERENCE
+    VectorMag(mGaussData,mGaussMag);
+    magErr = abs(mGaussMag - nomGaussMag);
+    if ( magErr >= nomGaussBound )
+    {
+        isMagValid = false;
+    }
+    else
+    {
+        isMagValid = true;
+    }
 
-	//////////////
+    //////////////
 
     // right now no need to actually convert gravity raw data
 
@@ -806,14 +811,14 @@ void rpyFiltering(bool isMagValid, float (&refRpyData)[3],float (&q)[4] )
     wrapAngles(rpyErr[2],1); // +/- pi
 
     // apply Gains to get new estimated rpy
-	// note Krpy is a global param
+    // note Krpy is a global param
     rpy[0] = rpy[0] + Krpy[0]*rpyErr[0];
-	rpy[1] = rpy[1] + Krpy[1]*rpyErr[1];
+    rpy[1] = rpy[1] + Krpy[1]*rpyErr[1];
 
-	if (isMagValid == true)
-	{
-		rpy[2] = rpy[2] + Krpy[2]*rpyErr[2];
-	}
+    if (isMagValid == true)
+    {
+        rpy[2] = rpy[2] + Krpy[2]*rpyErr[2];
+    }
 
     // convert rpy to quat
     euler2Quat(rpy, q);
