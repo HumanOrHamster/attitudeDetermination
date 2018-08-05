@@ -37,6 +37,13 @@ Since I have used a particular IMU MEMS sensor (mINimu-9 v2) to demonstrate this
 `const int CTRL_REG4_G     = 0x23;` enable axes and setup sensor output rate <br>
 `const int OUT_X_L_G     = 0x28;` the first read register of the acc sensor<br>
 
+** functions used
+`void setupLsm()` sets up the LSM303 acc and compass sensor <br>
+`void setupL3G()` sets up the L3G mag sensor <br>
+`void readRawLsm(bool applyAccelOffset, int (&mRawData)[3],int (&aBiasData)[3], int (&aRawData)[3])` get LSM303 sensor data and apply offsets <br>
+`void readRawL3G(bool applyOffset, int (&gBiasData)[3],int (&gRawData)[3])` get L3G sensor data and apply offsets <br>
+
+
 
 ###  LSM303DLHC Accelerometer and Magnetic Compass
 
