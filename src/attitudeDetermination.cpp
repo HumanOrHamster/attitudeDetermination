@@ -9,8 +9,7 @@ By Binh B.
 07/23/2018 first commit
 
 */
-
-
+ ///////// ANGLE UTILITIES  /////////
 #define ToRad(x) ((x)*0.01745329252)  // *pi/180
 #define ToDeg(x) ((x)*57.2957795131)  // *180/pi
 
@@ -18,41 +17,32 @@ By Binh B.
 #define twoPI 6.2831853
 #define PItwo 1.570796
 
+
+ ///////// HARDWARE SPECIFIC PARAMETERS HERE /////////
 // LSM303DLHC ACC and MAG Addresses
-const int LSM303_ACC_ADDR 			= 0b0011001;
-const int LSM303_MAG_ADDR 			= 0b0011110;
+const int LSM303_ACC_ADDR       = 0b0011001;
+const int LSM303_MAG_ADDR       = 0b0011110;
 
 // MAG Register LSM303DLHC
 const int CRA_REG_M         = 0x00;
 const int CRB_REG_M         = 0x01;
 const int MR_REG_M          = 0x02;
-const int OUT_X_H_M 		    = 0x03; // starting read register for mag
-
-
-// tbd on usage
-struct sensorParams
-{
-    float xSF;
-    float ySF;
-    float zSF;
-} lsm303Mag;
+const int OUT_X_H_M         = 0x03; // starting read register for mag
 
 // ACC Register LSM303DLHC
 const int CTRL_REG4_A       = 0x23;
 const int CTRL_REG1_A       = 0x20;
-const int OUT_X_L_A 		    = 0x28; // starting read register for acc
+const int OUT_X_L_A         = 0x28; // starting read register for acc
 
 // L3GD20 Address
-const int L3GD20_GYRO_ADDR	= 0b1101011;
+const int L3GD20_GYRO_ADDR  = 0b1101011;
 
 // GYRO Register L3GD20
-const int CTRL_REG1_G 		= 0x20;
-const int CTRL_REG4_G 		= 0x23;
-const int OUT_X_L_G 		= 0x28;
+const int CTRL_REG1_G     = 0x20;
+const int CTRL_REG4_G     = 0x23;
+const int OUT_X_L_G     = 0x28;
 
-const float r2d = 57.29577951308232;
-
-///////////
+ ///////// NON HARDWARE SPECIFIC PARAMETERS /////////
 // GLOBAL PARAMS
 int mRaw[3] = {0, 0, 0};
 int aRaw[3] = {0, 0, 0};
@@ -66,8 +56,11 @@ float aGrav[3] = {0.0, 0.0, 0.0};
 float gRad[3] = {0.0, 0.0, 0.0};
 float aNorm[3] = {0.0, 0.0, 0.0};
 
-int mMin[3] = { -665, -749, -577};
-int mMax[3] = {505, 404, 442};
+int mMin[3] = { -530, -633, -492};
+int mMax[3] = {454, 354, 352};
+//int mMin[3] = { 0, 0, 0};
+//int mMax[3] = {0, 0,0};
+
 int mOffset[3] = {0, 0, 0};
 
 // gyro bias
@@ -82,11 +75,9 @@ int extForceBoundDigi = 0.1*oneGDigit;
 int aMagDigi = 0;
 
 // mag external protection bound ~0.47 gauss nominal, +/- 10%
-float nomGaussMag = 0.47;
-float nomGaussBound = 0.15*nomGaussMag;
+float nomGaussMag = 0.46;
+float nomGaussBound = 0.3*nomGaussMag;
 bool isMagNomValid = true;
-
-
 
 float RefRpy[3] = {0.0, 0.0, 0.0};
 float SolRpy[3] = {0.0,0.0,0.0}; // fused solution
@@ -101,9 +92,12 @@ float quatRatePrev[4] = {0.0, 0.0, 0.0, 0.0};
 float quatPrev[4] = {1.0, 0.0, 0.0, 0.0};
 float quatSol[4] = {1.0, 0.0, 0.0, 0.0};
 
+ ///////// COMPLEMENTARY FILTER GAINS /////////
 // rpy filtering
 float Krpy[3]= {0.05, 0.05, 0.01}; // proportional gains
 
+
+ ///////// TIMING PARAMETERS /////////
 // execution dt
 float stepSize = 0.02;
 unsigned long stepSizeMicroSec = stepSize*1000000;
@@ -114,7 +108,7 @@ unsigned long t1;
 unsigned long t2;
 unsigned long t3;
 
-
+ ///////// FUNCTION DECLARATION /////////
 void printDataToSerial(byte opt);
 void printVec(int (&vec)[3]);
 void setupLsm();
@@ -159,13 +153,6 @@ void setup()
     setupLsm();
     setupL3G();
 
-    /*
-    // not used yet but for future implementation, also cant be initialized outside of setup.
-    lsm303Mag.xSF = 1100.0;
-    lsm303Mag.ySF = 1100.0;
-    lsm303Mag.zSF = 980.0;
-    */
-
     // optional mag cal
     //calMag(mMin, mMax, mOffset);
 
@@ -208,7 +195,7 @@ void loop()
     /*
     if (isMagNomValid == false)
     {
-    	Serial.println("mag Nom Value Exceeded");
+      Serial.println("mag Nom Value Exceeded");
     }
     */
 
@@ -279,6 +266,7 @@ void printDataToSerial(byte opt)
         Serial.print(ToDeg(SolRpy[2]));
         Serial.println();
     }
+
 }
 
 void printVec(int (&vec)[3])
@@ -555,9 +543,15 @@ void getRefRPY(int (&mRawData)[3], float (&mGaussData)[3], int (&mOffsetData)[3]
     ///////////////// CHECK FOR EXTERNAL MAG INTEREFERENCE
     VectorMag(mGaussData,mGaussMag);
     magErr = abs(mGaussMag - nomGaussMag);
+    //Serial.print("mag val: ");
+    //Serial.println(mGaussMag);
+
     if ( magErr >= nomGaussBound )
     {
         isMagValid = false;
+        Serial.print("Mag Exceeded Value ");
+        Serial.println(magErr);
+
     }
     else
     {
@@ -668,8 +662,8 @@ void calMag(int (&mMinData)[3], int (&mMaxData)[3], int (&offsetData)[3])
         printVec(mMinData);
 
         Serial.print("Max: ");
-        Serial.println("");
-        Serial.print("Min: ");
+        Serial.print("");
+        printVec(mMaxData);
 
         delay(100);
     }
