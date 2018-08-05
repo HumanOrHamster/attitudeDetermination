@@ -19,10 +19,10 @@ Since I have used a particular IMU MEMS sensor (mINimu-9 v2) to demonstrate this
 `const int LSM303_MAG_ADDR       = 0b0011110;` <br>
 
 **MAG Register LSM303DLHC** <br>
-`const int CRA_REG_M         = 0x00;` <br>
-`const int CRB_REG_M         = 0x01;` <br>
-`const int MR_REG_M          = 0x02;` <br>
-`const int OUT_X_H_M         = 0x03;` <br>
+`const int CRA_REG_M         = 0x00;` sets up the sensor output rate <br>
+`const int CRB_REG_M         = 0x01;` sets up full scale <br>
+`const int MR_REG_M          = 0x02;` sets up conversion mode (this is an ST Micro thing)<br>
+`const int OUT_X_H_M         = 0x03;` the first read register of the mag compass <br>
 
 **ACC Register LSM303DLHC** <br>
 `const int CTRL_REG4_A       = 0x23;` <br>
@@ -33,9 +33,9 @@ Since I have used a particular IMU MEMS sensor (mINimu-9 v2) to demonstrate this
 `const int L3GD20_GYRO_ADDR  = 0b1101011;` <br>
 
 **GYRO Register L3GD20** <br>
-`const int CTRL_REG1_G     = 0x20;` <br>
-`const int CTRL_REG4_G     = 0x23;` <br>
-`const int OUT_X_L_G     = 0x28;` <br>
+`const int CTRL_REG1_G     = 0x20;`  sets up FS <br>
+`const int CTRL_REG4_G     = 0x23;` enable axes and setup sensor output rate <br>
+`const int OUT_X_L_G     = 0x28;` the first read register of the acc sensor<br>
 
 
 ###  LSM303DLHC Accelerometer and Magnetic Compass
