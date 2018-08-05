@@ -15,7 +15,7 @@ filtered_sol = prev_filtered_sol + K_gain * ( ref_sol - gyro_sol).
 Since I have used a particular IMU MEMS sensor (mINimu-9 v2) to demonstrate this algorithm, if you intend to use a different sensor, then you will need to modify the following parameters and functions. 
 
 // LSM303DLHC ACC and MAG Addresses
-const int LSM303_ACC_ADDR       = 0b0011001;
+`const int LSM303_ACC_ADDR       = 0b0011001;`
 const int LSM303_MAG_ADDR       = 0b0011110;
 
 // MAG Register LSM303DLHC
