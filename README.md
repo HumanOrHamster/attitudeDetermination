@@ -33,7 +33,7 @@ Since I have used a particular IMU MEMS sensor (mINimu-9 v2) to demonstrate this
 `const int L3GD20_GYRO_ADDR  = 0b1101011;` <br>
 
 **GYRO Register L3GD20** <br>
-`const int CTRL_REG1_G     = 0x20;`  sets up FS <br>
+`const int CTRL_REG1_G     = 0x20;`  sets up full scale <br>
 `const int CTRL_REG4_G     = 0x23;` enable axes and setup sensor output rate <br>
 `const int OUT_X_L_G     = 0x28;` the first read register of the acc sensor<br>
 
