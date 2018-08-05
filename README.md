@@ -50,3 +50,5 @@ Since I have used a particular IMU MEMS sensor (mINimu-9 v2) to demonstrate this
 
 ## Detail Algorithm Description
 
+
+* [MinIMU-9 v2 (L3GD20 and LSM303DLHC carrier)](https://www.pololu.com/catalog/product/1268) (discontinued)
