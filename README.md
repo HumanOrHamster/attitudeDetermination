@@ -14,28 +14,28 @@ filtered_sol = prev_filtered_sol + K_gain * ( ref_sol - gyro_sol).
 ## Modifiable parts of the code
 Since I have used a particular IMU MEMS sensor (mINimu-9 v2) to demonstrate this algorithm, if you intend to use a different sensor, then you will need to modify the following parameters and functions. 
 
-// LSM303DLHC ACC and MAG Addresses
+LSM303DLHC ACC and MAG Addresses
 `const int LSM303_ACC_ADDR       = 0b0011001;`
-const int LSM303_MAG_ADDR       = 0b0011110;
+`const int LSM303_MAG_ADDR       = 0b0011110;`
 
-// MAG Register LSM303DLHC
-const int CRA_REG_M         = 0x00;
-const int CRB_REG_M         = 0x01;
-const int MR_REG_M          = 0x02;
-const int OUT_X_H_M         = 0x03; // starting read register for mag
+MAG Register LSM303DLHC
+`const int CRA_REG_M         = 0x00;`
+`const int CRB_REG_M         = 0x01;`
+`const int MR_REG_M          = 0x02;`
+`const int OUT_X_H_M         = 0x03;`
 
-// ACC Register LSM303DLHC
-const int CTRL_REG4_A       = 0x23;
-const int CTRL_REG1_A       = 0x20;
-const int OUT_X_L_A         = 0x28; // starting read register for acc
+ACC Register LSM303DLHC
+`const int CTRL_REG4_A       = 0x23;`
+`const int CTRL_REG1_A       = 0x20;`
+`const int OUT_X_L_A         = 0x28;`
 
-// L3GD20 Address
-const int L3GD20_GYRO_ADDR  = 0b1101011;
+L3GD20 Address
+`const int L3GD20_GYRO_ADDR  = 0b1101011;`
 
-// GYRO Register L3GD20
-const int CTRL_REG1_G     = 0x20;
-const int CTRL_REG4_G     = 0x23;
-const int OUT_X_L_G     = 0x28;
+GYRO Register L3GD20
+`const int CTRL_REG1_G     = 0x20;`
+`const int CTRL_REG4_G     = 0x23;`
+`const int OUT_X_L_G     = 0x28;`
 
 
 ###  LSM303DLHC Accelerometer and Magnetic Compass
